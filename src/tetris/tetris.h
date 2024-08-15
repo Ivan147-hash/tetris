@@ -1,6 +1,13 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ncurses.h>
+
+
+
 #define TICKS_START 0
 
 typedef struct TBlock {
@@ -51,6 +58,9 @@ typedef struct TGame{
     int game;
     int ticks;
     int ticks_temp;
+    int fig;
+    int next_fig;
+    int status;
     TPlayer *player;
 } TGame;
 

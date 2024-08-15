@@ -1,7 +1,8 @@
 #include "tetris.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <time.h>
 
 #ifndef TETRIS_C
 #define TETRIS_C
@@ -48,6 +49,7 @@ TGame* start_Game(int width, int height, int size, int count, TBlock *temp_fig) 
     tetg->ticks_temp = TICKS_START;
     tetg->score = 0;
     tetg->game = PLAYING;
+    tetg->status = 1;
     return tetg;
 }
 
@@ -109,7 +111,7 @@ void compound_fig(TGame *tetg) {
 }
 
 void tact_game(TGame *tetg) {
-    //if (tetg->ticks_temp <= 0) {
+    if (tetg->ticks_temp <= 0) {
         tetg->ticks_temp = tetg->ticks;
         move_down(tetg);
         if (clash(tetg)) {
@@ -122,40 +124,40 @@ void tact_game(TGame *tetg) {
                 return;
             }
         }
-    //}
-    switch(tetg->player->action) {
-        case BUT_F:
-            TFigure *old = tetg->figure;
-            TFigure *new = turn_fig(tetg);
-            tetg->figure = new;
-            if (clash(tetg)) {
-                tetg->figure = old;
-                freeTFigure(new);
-            } else {
-                freeTFigure(old);
-            }
-            break;
-        case BUT_DOWN:
-            move_down(tetg);
-            if (clash(tetg)) {
-                move_up(tetg);
-            }
-            break;
-        case BUT_LEFT:
-            move_left(tetg);
-            if (clash(tetg)) {
-                move_right(tetg);
-            }
-            break;
-        case BUT_RIGHT:
-            move_right(tetg);
-            if (clash(tetg)) {
-                move_left(tetg);
-            }
-            break;
-        default: 
-            break;
     }
+    // switch(tetg->player->action) {
+    //     case BUT_F:
+    //         TFigure *old = tetg->figure;
+    //         TFigure *new = turn_fig(tetg);
+    //         tetg->figure = new;
+    //         if (clash(tetg)) {
+    //             tetg->figure = old;
+    //             freeTFigure(new);
+    //         } else {
+    //             freeTFigure(old);
+    //         }
+    //         break;
+    //     case BUT_DOWN:
+    //         move_down(tetg);
+    //         if (clash(tetg)) {
+    //             move_up(tetg);
+    //         }
+    //         break;
+    //     case BUT_LEFT:
+    //         move_left(tetg);
+    //         if (clash(tetg)) {
+    //             move_right(tetg);
+    //         }
+    //         break;
+    //     case BUT_RIGHT:
+    //         move_right(tetg);
+    //         if (clash(tetg)) {
+    //             move_left(tetg);
+    //         }
+    //         break;
+    //     default: 
+    //         break;
+    // }
     tetg->ticks_temp--;
 }
 
@@ -199,10 +201,14 @@ void drop_fig(TGame *tetg) {
     TFigure *fig = build_fig(tetg);
     fig->x = tetg->field->width / 2 - fig->size / 2;
     fig->y = 0;
-    int nfig = rand() % tetg->figures->count;
+    //tetg->next_fig = rand() % tetg->figures->count;
+    if (tetg->status == 1) tetg->fig = rand() % tetg->figures->count;
+    else if (tetg->status != 1) tetg->fig = tetg->next_fig;
+    tetg->next_fig = rand() % tetg->figures->count;
+    printf("|%d %d|\n", tetg->fig, tetg->next_fig);
     for (int i = 0; i < fig->size; i++) {
         for (int j = 0; j < fig->size; j++) {
-            fig->block[i * fig->size + j].n = tetg->figures->blocks[nfig * fig->size * fig->size + i * fig->size + j].n;
+            fig->block[i * fig->size + j].n = tetg->figures->blocks[tetg->fig * fig->size * fig->size + i * fig->size + j].n;
         }
     }
     freeTFigure(tetg->figure);
