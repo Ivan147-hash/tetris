@@ -6,8 +6,6 @@
 #include <time.h>
 #include <ncurses.h>
 
-
-
 typedef struct TBlock {
     int n;
 } TBlock;
@@ -67,9 +65,59 @@ typedef struct TGame{
     TPlayer *player;
 } TGame;
 
+typedef struct Windows{
+    WINDOW *board ;
+    WINDOW *record;
+    WINDOW *next_fig;
+} Windows;
+
+// TBlock all_blocks[] = {
+//     0, 0, 1, 0, 0,
+//     0, 0, 1, 0, 0,
+//     0, 0, 1, 0, 0,
+//     0, 0, 1, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 0, 1, 1, 0,
+//     0, 0, 1, 1, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 1, 0, 0, 0,
+//     0, 1, 1, 1, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 1, 0,
+//     0, 1, 1, 1, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 0, 1, 1, 0,
+//     0, 1, 1, 0, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 0, 1, 0, 0,
+//     0, 1, 1, 1, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+
+//     0, 0, 0, 0, 0,
+//     0, 1, 1, 0, 0,
+//     0, 0, 1, 1, 0,
+//     0, 0, 0, 0, 0,
+//     0, 0, 0, 0, 0,
+// };
+
 TGame* start_Game(int width, int height, int size, int count, TBlock *temp_fig);
 
-void freeTGame(TGame *tetg);
+void freeTGame(TGame *tetg, Windows *win);
 
 TField* build_field(int width, int height);
 
@@ -116,5 +164,11 @@ int read_record();
 void write_record(TGame *tetg);
 
 int level_up(TGame *tetg);
+
+void action_play(TGame *tetg, WINDOW *board);
+
+Windows* init_win();
+
+void freeWindows(Windows *win);
 
 #endif

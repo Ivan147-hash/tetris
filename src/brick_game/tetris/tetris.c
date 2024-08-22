@@ -1,9 +1,5 @@
 #include "tetris.h"
 
-// #include <stdlib.h>
-// #include <stdio.h>
-// #include <time.h>
-
 #ifndef TETRIS_C
 #define TETRIS_C
 
@@ -52,11 +48,12 @@ TGame* start_Game(int width, int height, int size, int count, TBlock *temp_fig) 
     return tetg;
 }
 
-void freeTGame(TGame *tetg) {
+void freeTGame(TGame *tetg, Windows *win) {
     if (tetg) {
         freeTField(tetg->field);
         freeTFigures(tetg->figures);
         free(tetg);
+        freeWindows(win);
     }
 }
 
@@ -109,6 +106,10 @@ void compound_fig(TGame *tetg) {
 
 void tact_game(TGame *tetg) {
         move_down(tetg);
+        if (clash(tetg) && tetg->figure->y <= 5) {
+            tetg->status = GAMEOVER;
+            return;
+        }
         if (clash(tetg)) {
             move_up(tetg);
             compound_fig(tetg);
@@ -119,9 +120,6 @@ void tact_game(TGame *tetg) {
                 return;
             }
         }
-    // switch(tetg->player->action) {
-
-    // }
 }
 
 int deleteline(TGame *tetg) {
@@ -137,10 +135,6 @@ int deleteline(TGame *tetg) {
     else if (count == 2) count = 300;
     else if (count == 3) count = 700;
     else if (count >= 4) count = 1500;
-
-    // if (count > tetg->hard_score) {
-    //     tetg->hard_score = count;
-    // }
     return count;
 }
 
@@ -171,12 +165,11 @@ void drop_fig(TGame *tetg) { // 1, 7, 8, 10
     srand(time(NULL));
     TFigure *fig = build_fig(tetg);
     fig->x = tetg->field->width / 2 - fig->size / 2;
-    fig->y = 0;
-    // tetg->next_fig = rand() % tetg->figures->count;
+    fig->y = 1;
     if (tetg->status == 1) tetg->fig = rand() % tetg->figures->count;
     else if (tetg->status != 1) tetg->fig = tetg->next_fig;
+    if (tetg->fig == 1) fig->x -= 1;
     tetg->next_fig = rand() % tetg->figures->count;
-    // printf("|%d %d|\n", tetg->fig, tetg->next_fig);
     for (int i = 0; i < fig->size; i++) {
         for (int j = 0; j < fig->size; j++) {
             fig->block[i * fig->size + j].n = tetg->figures->blocks[tetg->fig * fig->size * fig->size + i * fig->size + j].n;
@@ -242,9 +235,77 @@ void write_record(TGame *tetg) {
 int level_up(TGame *tetg) {
     int speed = 500;
     tetg->level = tetg->score / 600 + 1;
-    //if (tetg->level == 0) tetg->level = 1;
     speed = 550 - tetg->level * 50;
     return speed;
 }
+
+void action_play(TGame *tetg, WINDOW *board) {
+    int chr = getch();
+        switch(chr) {
+        case KEY_UP:
+            TFigure *old = tetg->figure;
+            TFigure *new = turn_fig(tetg);
+            tetg->figure = new;
+            if (clash(tetg) == 1) move_right(tetg);
+            if (clash(tetg) == 2) move_left(tetg);
+            if (clash(tetg) || tetg->fig == 1) {
+                tetg->figure = old;
+                freeTFigure(new);
+            } else {
+                freeTFigure(old);
+            }
+            tetg->status = UP;
+            break;
+        case KEY_DOWN:
+            move_down(tetg);
+            if (clash(tetg)) {
+                move_up(tetg);
+            }
+            tetg->status = DOWN;
+            break;
+        case KEY_LEFT:
+            move_left(tetg);
+            if (clash(tetg)) {
+                move_right(tetg);
+            }
+            tetg->status = LEFT;
+            break;
+        case KEY_RIGHT:
+            move_right(tetg);
+            if (clash(tetg)) {
+                move_left(tetg);
+            }
+            tetg->status = RIGHT;
+            break;
+        case 'q':
+            tetg->status = GAMEOVER;
+            break;
+        case ' ':
+            if (tetg->status == PAUSE) tetg->status = PLAYING;
+            else {
+                tetg->status = PAUSE;
+            }
+            break;
+        default: 
+            if (tetg->status != GAMEOVER && tetg->status != PAUSE) tetg->status = DOWN;
+            break;
+    }
+}
+
+Windows* init_win() {
+    Windows *win = (Windows *)malloc(sizeof(Windows));
+    if (win != NULL) {
+        win->board = newwin(26, 22, 5, 5);
+        win->next_fig = newwin(6, 14, 11, 30);;
+        win->record = newwin(12, 14, 19, 30);
+    }
+}
+
+void freeWindows(Windows *win) {
+    if (win) {
+        free(win);
+    }
+}
+
 
 #endif
