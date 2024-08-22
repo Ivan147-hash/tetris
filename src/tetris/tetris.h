@@ -8,8 +8,6 @@
 
 
 
-#define TICKS_START 0
-
 typedef struct TBlock {
     int n;
 } TBlock;
@@ -35,7 +33,13 @@ typedef struct TField{
 
 enum {
     GAMEOVER = 0,
-    PLAYING
+    START,
+    PLAYING,
+    PAUSE, 
+    LEFT,
+    RIGHT,
+    DOWN,
+    UP
 };
 
 enum {
@@ -55,12 +59,11 @@ typedef struct TGame{
     TFigure *figure;
     TFigures *figures;
     int score;
-    int game;
-    int ticks;
-    int ticks_temp;
+    int hard_score;
     int fig;
     int next_fig;
     int status;
+    int level;
     TPlayer *player;
 } TGame;
 
@@ -105,5 +108,13 @@ void freeTFigure(TFigure *tetf);
 TFigure* turn_fig(TGame *tetg);
 
 void print_tet(TGame *tetg, WINDOW *window);
+
+void color_block(TField *tetf, TFigure *fig, int i, int j);
+
+int read_record();
+
+void write_record(TGame *tetg);
+
+int level_up(TGame *tetg);
 
 #endif

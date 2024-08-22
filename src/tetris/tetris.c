@@ -45,11 +45,10 @@ TGame* start_Game(int width, int height, int size, int count, TBlock *temp_fig) 
     TGame *tetg = (TGame*)malloc(sizeof(TGame));
     tetg->field = build_field(width, height);
     tetg->figures = build_figures(temp_fig, count, size);
-    tetg->ticks = TICKS_START;
-    tetg->ticks_temp = TICKS_START;
     tetg->score = 0;
-    tetg->game = PLAYING;
-    tetg->status = 1;
+    tetg->status = START;
+    tetg->hard_score = read_record();
+    tetg->level = 1;
     return tetg;
 }
 
@@ -85,12 +84,10 @@ int clash(TGame *tetg) {
             if (t->block[i * t->size + j].n != 0) {
                 int fx = t->x + j;
                 int fy = t->y + i;
-                if (tf->blocks[fy * tf->width + fx].n != 0) {
-                    return 1;
-                }
-                if (fx < 0 || fx >= tf->width || fy < 0 || fy >= tf->height + 1) {
-                    return 1;
-                }
+                if (tf->blocks[fy * tf->width + fx].n != 0) return 3;
+                if(fx < 0) return 1;
+                if(fx >= tf->width) return 2;
+                if (fy < 0 || fy >= tf->height) return 3;
             }
         }
     }
@@ -111,8 +108,6 @@ void compound_fig(TGame *tetg) {
 }
 
 void tact_game(TGame *tetg) {
-    if (tetg->ticks_temp <= 0) {
-        tetg->ticks_temp = tetg->ticks;
         move_down(tetg);
         if (clash(tetg)) {
             move_up(tetg);
@@ -120,45 +115,13 @@ void tact_game(TGame *tetg) {
             tetg->score += deleteline(tetg);
             drop_fig(tetg);
             if (clash(tetg)) {
-                tetg->game = GAMEOVER;
+                tetg->status = GAMEOVER;
                 return;
             }
         }
-    }
     // switch(tetg->player->action) {
-    //     case BUT_F:
-    //         TFigure *old = tetg->figure;
-    //         TFigure *new = turn_fig(tetg);
-    //         tetg->figure = new;
-    //         if (clash(tetg)) {
-    //             tetg->figure = old;
-    //             freeTFigure(new);
-    //         } else {
-    //             freeTFigure(old);
-    //         }
-    //         break;
-    //     case BUT_DOWN:
-    //         move_down(tetg);
-    //         if (clash(tetg)) {
-    //             move_up(tetg);
-    //         }
-    //         break;
-    //     case BUT_LEFT:
-    //         move_left(tetg);
-    //         if (clash(tetg)) {
-    //             move_right(tetg);
-    //         }
-    //         break;
-    //     case BUT_RIGHT:
-    //         move_right(tetg);
-    //         if (clash(tetg)) {
-    //             move_left(tetg);
-    //         }
-    //         break;
-    //     default: 
-    //         break;
+
     // }
-    tetg->ticks_temp--;
 }
 
 int deleteline(TGame *tetg) {
@@ -170,6 +133,14 @@ int deleteline(TGame *tetg) {
             count++;
         }
     }
+    if (count == 1) count = 100;
+    else if (count == 2) count = 300;
+    else if (count == 3) count = 700;
+    else if (count >= 4) count = 1500;
+
+    // if (count > tetg->hard_score) {
+    //     tetg->hard_score = count;
+    // }
     return count;
 }
 
@@ -196,16 +167,16 @@ void line_down(TField *tetf, int i) {
     }
 }
 
-void drop_fig(TGame *tetg) {
+void drop_fig(TGame *tetg) { // 1, 7, 8, 10
     srand(time(NULL));
     TFigure *fig = build_fig(tetg);
     fig->x = tetg->field->width / 2 - fig->size / 2;
     fig->y = 0;
-    //tetg->next_fig = rand() % tetg->figures->count;
+    // tetg->next_fig = rand() % tetg->figures->count;
     if (tetg->status == 1) tetg->fig = rand() % tetg->figures->count;
     else if (tetg->status != 1) tetg->fig = tetg->next_fig;
     tetg->next_fig = rand() % tetg->figures->count;
-    printf("|%d %d|\n", tetg->fig, tetg->next_fig);
+    // printf("|%d %d|\n", tetg->fig, tetg->next_fig);
     for (int i = 0; i < fig->size; i++) {
         for (int j = 0; j < fig->size; j++) {
             fig->block[i * fig->size + j].n = tetg->figures->blocks[tetg->fig * fig->size * fig->size + i * fig->size + j].n;
@@ -244,6 +215,36 @@ TFigure* turn_fig(TGame *tetg) {
         }
     }
     return new;
+}
+
+int read_record() {
+    int hard = 2;
+    FILE *fp = fopen("record.txt", "r");
+    if(fp != NULL)
+    {
+        fscanf(fp, "%d", &hard);
+        fclose(fp);
+    }
+    return hard;
+}
+
+void write_record(TGame *tetg) {
+    if (tetg->hard_score < tetg->score) {
+        FILE *fp = fopen("record.txt", "w");
+        if(fp != NULL)
+        {
+            fprintf(fp, "%d", tetg->score);
+            fclose(fp);
+        }
+    }
+}
+
+int level_up(TGame *tetg) {
+    int speed = 500;
+    tetg->level = tetg->score / 600 + 1;
+    //if (tetg->level == 0) tetg->level = 1;
+    speed = 550 - tetg->level * 50;
+    return speed;
 }
 
 #endif
