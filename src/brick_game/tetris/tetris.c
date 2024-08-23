@@ -299,6 +299,7 @@ Windows* init_win() {
         win->next_fig = newwin(6, 14, 11, 30);;
         win->record = newwin(12, 14, 19, 30);
     }
+    return win;
 }
 
 void freeWindows(Windows *win) {
@@ -307,5 +308,20 @@ void freeWindows(Windows *win) {
     }
 }
 
+void init_ncurses() {
+    initscr();
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_WHITE);
+    init_pair(2, COLOR_RED, COLOR_RED);
+    init_pair(3, COLOR_BLACK, COLOR_BLACK);
+    init_pair(4, COLOR_CYAN, COLOR_CYAN);
+
+    cbreak();
+    keypad(stdscr, TRUE);
+    timeout(0);
+    noecho();
+    nodelay(stdscr, TRUE);
+    scrollok(stdscr, TRUE);
+}
 
 #endif

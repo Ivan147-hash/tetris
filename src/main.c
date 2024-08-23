@@ -46,27 +46,26 @@ TBlock all_blocks[] = {
 };
 
 int main(int argc, char* argv[]) {
+    
     struct  timespec sp_start, sp_end, ts1, ts2 = {0, 0};
 
-    initscr();
-
+    init_ncurses();
+    // initscr();
+    
     Windows *WIN = init_win();
-    // WINDOW *board = newwin(26, 22, 5, 5);
-    // WINDOW *record = newwin(12, 14, 19, 30);
-    // WINDOW *next_fig = newwin(6, 14, 11, 30);
 
-    start_color();
-    init_pair(1, COLOR_WHITE, COLOR_WHITE);
-    init_pair(2, COLOR_RED, COLOR_RED);
-    init_pair(3, COLOR_BLACK, COLOR_BLACK);
-    init_pair(4, COLOR_CYAN, COLOR_CYAN);
+    // start_color();
+    // init_pair(1, COLOR_WHITE, COLOR_WHITE);
+    // init_pair(2, COLOR_RED, COLOR_RED);
+    // init_pair(3, COLOR_BLACK, COLOR_BLACK);
+    // init_pair(4, COLOR_CYAN, COLOR_CYAN);
 
-    cbreak();
-    keypad(stdscr, TRUE);
-    timeout(0);
-    noecho();
-    nodelay(stdscr, TRUE);
-    scrollok(stdscr, TRUE);
+    // cbreak();
+    // keypad(stdscr, TRUE);
+    // timeout(0);
+    // noecho();
+    // nodelay(stdscr, TRUE);
+    // scrollok(stdscr, TRUE);
 
     TGame * tetg = start_Game(10, 25, 5, 7, all_blocks);
 

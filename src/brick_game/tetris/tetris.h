@@ -171,4 +171,6 @@ Windows* init_win();
 
 void freeWindows(Windows *win);
 
+void init_ncurses();
+
 #endif
