@@ -1,33 +1,18 @@
 CC = gcc
 FLAGS = -Wall -Wextra -Werror
-OBJ = obj
 
 PROJECT_NAME = tetris
 LIB_NAME = tetris
 LIB_SRC = $(wildcard brick_game/tetris/*.c)
 GUI_SRC = $(wildcard gui/cli/*.c)
 
-SOURCES = $(wildcard *.c)
-OBJECTS = $(patsubst %.c, $(OBJDIR)%.o, $(SOURCES))
 TEST = s21_test
-TEST_DIR = test/
 RM_EXTS := o a out gcno gcda gcov info html css
 
-LFLAGS=-lcheck -lpthread -lsubunit -lm
 GCOV_FLAGS=-fprofile-arcs -ftest-coverage -fPIC
 CFILES=tetris.a
 CEXE=s21_test
 
-TEST_CFILES=test/*.c
-GUIDIR=gui/cli
-LIBDIR=brick_game/tetris
-LIBFILES=$(LIBDIR)/*.c
-
-BUILD_DIR := build
-TESTS_DIR := test
-REPORT_DIR := report
-LIB_FLAGS := $(shell pkg-config --static --cflags --libs check ncurses)
-TEST_FLAGS=-lpthread -lcheck  -Wno-nonnull -Wno-memset-transposed-args -lm -lsubunit
 
 OS := $(shell uname)
 UBUNTU := $(shell hostnamectl | grep -o 'Ubuntu')
@@ -69,11 +54,6 @@ run: install
 	build/$(PROJECT_NAME)
 
 build: all
-
-repo:
-	mkdir -p $(OBJ)
-$(OBJDIR)%.o: %.c
-	$(CC) $(FLAGS) -c $< -o obj/$@
 
 install: tetris.a gui.o main.o
 	mkdir -p build/
@@ -133,7 +113,7 @@ vg: clean tetris.a
 
 
 clean:
-	rm -rf $(TEST) *.o *.a *.gcno *.gcda *.gcov *.info report a.out *.dSYM obj
+	rm -rf $(TEST) *.o *.a *.gcno *.gcda *.gcov *.info report a.out *.dSYM obj s21_test
 	@for ext in $(RM_EXTS); do \
 	find ./ -type f -name "*.$$ext" -exec rm {} \;; \
 	done

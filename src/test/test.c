@@ -4,7 +4,7 @@
 #include "../brick_game/tetris/tetris.h"
 
 START_TEST(tetris_test_1) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
   ck_assert_int_eq(tetg->status, START);
   action_play(tetg, KEY_UP);
@@ -33,7 +33,7 @@ Suite *test_status() {
 }
 
 START_TEST(tetris_test_2) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
   int flag = level_up(tetg);
   ck_assert_int_eq(flag, 500);
@@ -52,7 +52,7 @@ Suite *test_level_up() {
 }
 
 START_TEST(tetris_test_3) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
   tetg->figure->y = 18;
   compound_fig(tetg);
@@ -72,37 +72,37 @@ Suite *test_compound() {
 }
 
 START_TEST(tetris_test_4) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
-  int i = tetg->field->height - 1;
-  for (int j = 0; j < tetg->field->width; j++) {
-    tetg->field->blocks[i * tetg->field->width + j].n = 0;
+  int i = HIGHT - 1;
+  for (int j = 0; j < WIDTH; j++) {
+    tetg->field->blocks[i * WIDTH + j].n = 0;
   }
   int flag = deleteline(tetg);
   ck_assert_int_eq(flag, 0);
 
-  for (int j = 0; j < tetg->field->width; j++) {
-    tetg->field->blocks[i * tetg->field->width + j].n = 1;
+  for (int j = 0; j < WIDTH; j++) {
+    tetg->field->blocks[i * WIDTH + j].n = 1;
   }
   flag = deleteline(tetg);
   ck_assert_int_eq(flag, 100);
   for (int x = i; x > i - 2; x--) {
-    for (int j = 0; j < tetg->field->width; j++) {
-      tetg->field->blocks[x * tetg->field->width + j].n = 1;
+    for (int j = 0; j < WIDTH; j++) {
+      tetg->field->blocks[x * WIDTH + j].n = 1;
     }
   }
   flag = deleteline(tetg);
   ck_assert_int_eq(flag, 300);
   for (int x = i; x > i - 3; x--) {
-    for (int j = 0; j < tetg->field->width; j++) {
-      tetg->field->blocks[x * tetg->field->width + j].n = 1;
+    for (int j = 0; j < WIDTH; j++) {
+      tetg->field->blocks[x * WIDTH + j].n = 1;
     }
   }
   flag = deleteline(tetg);
   ck_assert_int_eq(flag, 700);
   for (int x = i; x > i - 4; x--) {
-    for (int j = 0; j < tetg->field->width; j++) {
-      tetg->field->blocks[x * tetg->field->width + j].n = 1;
+    for (int j = 0; j < WIDTH; j++) {
+      tetg->field->blocks[x * WIDTH + j].n = 1;
     }
   }
   flag = deleteline(tetg);
@@ -122,12 +122,12 @@ Suite *test_score() {
 }
 
 START_TEST(tetris_test_5) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
   tetg->fig = 2;
-  int i = tetg->field->height - 1;
-  for (int j = 0; j < tetg->field->width; j++) {
-    tetg->field->blocks[i * tetg->field->width + j].n = 1;
+  int i = HIGHT - 1;
+  for (int j = 0; j < WIDTH; j++) {
+    tetg->field->blocks[i * WIDTH + j].n = 1;
   }
   tetg->figure->y = 22;
   tact_game(tetg);
@@ -147,7 +147,7 @@ Suite *test_tact_game_1() {
 }
 
 START_TEST(tetris_test_6) {
-  TGame *tetg = start_Game(10, 25, 5, 7);
+  TGame *tetg = start_Game();
   drop_fig(tetg);
   tetg->fig = 2;
   tetg->figure->x = -3;

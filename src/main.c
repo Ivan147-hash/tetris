@@ -8,7 +8,7 @@ int main() {
 
   Windows *WIN = init_win();
 
-  TGame *tetg = start_Game(7);
+  TGame *tetg = start_Game();
 
   clock_gettime(CLOCK_MONOTONIC, &ts1);
   long last_time = ts1.tv_sec * 1000 + ts1.tv_nsec / 1000000;

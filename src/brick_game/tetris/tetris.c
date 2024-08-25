@@ -27,10 +27,8 @@ TBlock all_blocks[] = {
 };
 
 // Создание всех фигур
-TFigures *build_figures(TBlock *temp_fig, int count) {
+TFigures *build_figures(TBlock *temp_fig) {
   TFigures *tetfig = (TFigures *)malloc(sizeof(TFigures));
-  tetfig->count = count;
-  //tetfig->size = size;
   tetfig->blocks = temp_fig;
   return tetfig;
 }
@@ -45,8 +43,6 @@ void freeTFigures(TFigures *tetfig) {
 // Создание одной фигуры
 TField *build_field() {
   TField *tetf = (TField *)malloc(sizeof(TField));
-  // tetf->width = width;
-  // tetf->height = height;
   tetf->blocks = (TBlock *)malloc(sizeof(TBlock) * WIDTH * HIGHT);
   for (int i = 0; i < WIDTH * HIGHT; i++) {
     tetf->blocks[i].n = 0;
@@ -65,11 +61,11 @@ void freeTField(TField *tetf) {
 }
 
 // Создание параметров структуры игры
-TGame *start_Game(int count) {
+TGame *start_Game() {
   TGame *tetg = (TGame *)malloc(sizeof(TGame));
   tetg->field = build_field();
   tetg->figure = build_fig();
-  tetg->figures = build_figures(all_blocks, count);
+  tetg->figures = build_figures(all_blocks);
   tetg->score = 0;
   tetg->status = START;
   tetg->hard_score = read_record();
@@ -126,8 +122,7 @@ int compound_fig(TGame *tetg) {
       if (tfig->block[i * SIZE + j].n != 0) {
         int fx = tfig->x + j;
         int fy = tfig->y + i;
-        tetg->field->blocks[fy * WIDTH + fx].n =
-            tfig->block[i * SIZE + j].n;
+        tetg->field->blocks[fy * WIDTH + fx].n = tfig->block[i * SIZE + j].n;
       }
     }
   }
@@ -189,8 +184,7 @@ void line_down(TField *tetf, int i) {
   } else {
     for (int k = i; k > 0; k--) {
       for (int j = 0; j < WIDTH; j++) {
-        tetf->blocks[k * WIDTH + j].n =
-            tetf->blocks[(k - 1) * WIDTH + j].n;
+        tetf->blocks[k * WIDTH + j].n = tetf->blocks[(k - 1) * WIDTH + j].n;
       }
     }
   }
@@ -203,15 +197,16 @@ void drop_fig(TGame *tetg) {
   fig->x = WIDTH / 2 - SIZE / 2;
   fig->y = 1;
   if (tetg->status == 1)
-    tetg->fig = rand() % tetg->figures->count;
+    tetg->fig = rand() % COUNT;
   else
     tetg->fig = tetg->next_fig;
   int f = tetg->fig;
   if (tetg->fig == 1) fig->x -= 1;
-  tetg->next_fig = rand() % tetg->figures->count;
+  tetg->next_fig = rand() % COUNT;
   for (int i = 0; i < SIZE; i++) {
     for (int j = 0; j < SIZE; j++) {
-      fig->block[i * SIZE + j].n = tetg->figures->blocks[f * SIZE * SIZE + i * SIZE + j].n;
+      fig->block[i * SIZE + j].n =
+          tetg->figures->blocks[f * SIZE * SIZE + i * SIZE + j].n;
     }
   }
   freeTFigure(tetg->figure);
@@ -224,7 +219,7 @@ TFigure *build_fig() {
   TFigure *tetf = (TFigure *)malloc(sizeof(TFigure));
   tetf->x = 0;
   tetf->y = 0;
-  //tetf->size = SIZE;
+  // tetf->size = SIZE;
   tetf->block = (TBlock *)malloc(sizeof(TBlock) * SIZE * SIZE);
   return tetf;
 }
