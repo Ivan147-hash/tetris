@@ -1,0 +1,13 @@
+Running suite(s): test_status
+100%: Checks: 1, Failures: 0, Errors: 0
+Running suite(s): test_level_up
+100%: Checks: 1, Failures: 0, Errors: 0
+Running suite(s): test_compound
+100%: Checks: 1, Failures: 0, Errors: 0
+Running suite(s): test_score
+100%: Checks: 1, Failures: 0, Errors: 0
+Running suite(s): test_tact_game_1
+100%: Checks: 1, Failures: 0, Errors: 0
+Running suite(s): test_tact_game_2
+100%: Checks: 1, Failures: 0, Errors: 0
+FAIL: 0

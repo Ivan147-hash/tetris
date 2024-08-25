@@ -1,48 +1,53 @@
 #include "front.h"
 
+// Отрисовка игрового поля
 void print_tet(TGame *tetg, WINDOW *board) {
-    TField *tetf = tetg->field;
-    TFigure *fig = tetg->figure;
-    int color = 1;
-    int col_fig;
-    if (tetg->status == START) color = 4;
-    werase(board);
-    wbkgd(board, COLOR_PAIR(3));
-    for (int i = 0; i < tetf->height + 5; i++) {
-        for (int j = 0; j < tetf->width; j++) {
-            if (i >= 5) {
-                wbkgdset(board, COLOR_PAIR(color));
-                mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
-                mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
-            }
-            if (tetf->blocks[i * tetf->width + j].n == 1) {
-                wbkgdset(board, COLOR_PAIR(4));
-                mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
-                mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
-            } 
-            else
-                {int x = j - fig->x;
-                int y = i - fig->y;
-                if (x >= 0 && x < fig->size && y >= 0 && y < fig->size) {
-                    if (fig->block[y * fig->size + x].n != 0) {
-                        wbkgdset(board, COLOR_PAIR(2));
-                        mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
-                        mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
-                    }
-                }
-            }
-             if (i < 5) {
-                wbkgdset(board, COLOR_PAIR(3));
-                mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
-                mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
-            }
-        }
+  TField *tetf = tetg->field;
+  TFigure *fig = tetg->figure;
+  int color = 1;
+  if (tetg->status == START) color = 4;
+  werase(board);
+  wbkgd(board, COLOR_PAIR(3));
+  for (int i = 0; i < HIGHT + 5; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      if (i >= 5) {
+        wbkgdset(board, COLOR_PAIR(color));
+        mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
+        mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
+      }
+      if (tetf->blocks[i * WIDTH + j].n == 1) {
+        wbkgdset(board, COLOR_PAIR(4));
+        mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
+        mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
+      } else {
+        print_figure(fig, i, j, board);
+      }
+      if (i < 5) {
+        wbkgdset(board, COLOR_PAIR(3));
+        mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
+        mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
+      }
     }
-     wrefresh(board);
+  }
+  wrefresh(board);
 }
 
+// Отрисовка летящей фигуры
+void print_figure(TFigure *fig, int i, int j, WINDOW *board) {
+  int x = j - fig->x;
+  int y = i - fig->y;
+  if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
+    if (fig->block[y * SIZE + x].n != 0) {
+      wbkgdset(board, COLOR_PAIR(2));
+      mvwprintw(board, i + 1, 2 * j + 1, "%c", ' ');
+      mvwprintw(board, i + 1, 2 * j + 2, "%c", ' ');
+    }
+  }
+}
+
+// Отрисовка поля с информацией
 void print_rec(TGame *tetg, WINDOW *record) {
-    werase(record);
+  werase(record);
   int score = tetg->score;
   int high = tetg->hard_score;
   int speed = tetg->level;
@@ -59,29 +64,34 @@ void print_rec(TGame *tetg, WINDOW *record) {
   wrefresh(record);
 }
 
+// Отрисовка поля со следующей фигурой
 void print_fig(TGame *tetg, WINDOW *next_fig) {
-    werase(next_fig);
-    wbkgd(next_fig, COLOR_PAIR(1));
-    for (int row = 0; row < tetg->figure->size; row++) {
-        for (int col = 0; col < tetg->figure->size; col++) {
-            if (tetg->figures->blocks[tetg->next_fig * tetg->figure->size * tetg->figure->size + row * tetg->figure->size + col].n == 0) {
-                wbkgdset(next_fig, COLOR_PAIR(1));
-                mvwprintw(next_fig, row + 1, 2 * col + 1, "%c", ' ');
-                mvwprintw(next_fig, row + 1, 2 * col + 2, "%c", ' ');
-            } else if (tetg->figures->blocks[tetg->next_fig * tetg->figure->size * tetg->figure->size + row * tetg->figure->size + col].n == 1) {
-                wbkgdset(next_fig, COLOR_PAIR(2));
-                mvwprintw(next_fig, row + 1, 2 * col + 1, "%c", ' ');
-                mvwprintw(next_fig, row + 1, 2 * col + 2, "%c", ' ');
-            }
-        }
+  int fig = tetg->next_fig;
+  int next = tetg->next_fig;
+  werase(next_fig);
+  wbkgd(next_fig, COLOR_PAIR(1));
+  for (int row = 0; row < SIZE; row++) {
+    for (int col = 0; col < SIZE; col++) {
+      if (tetg->figures->blocks[fig * SIZE * SIZE + row * SIZE + col].n == 0) {
+        wbkgdset(next_fig, COLOR_PAIR(1));
+        mvwprintw(next_fig, row + 1, 2 * col + 1, "%c", ' ');
+        mvwprintw(next_fig, row + 1, 2 * col + 2, "%c", ' ');
+      } else if (tetg->figures->blocks[next * SIZE * SIZE + row * SIZE + col]
+                     .n == 1) {
+        wbkgdset(next_fig, COLOR_PAIR(2));
+        mvwprintw(next_fig, row + 1, 2 * col + 1, "%c", ' ');
+        mvwprintw(next_fig, row + 1, 2 * col + 2, "%c", ' ');
+      }
     }
-    wbkgdset(next_fig, COLOR_PAIR(1));
-    mvwprintw(next_fig, 0, 1, "NEXT FIGURE");
-    wattroff(next_fig, COLOR_PAIR(1));
-    wrefresh(next_fig);
+  }
+  wbkgdset(next_fig, COLOR_PAIR(1));
+  mvwprintw(next_fig, 0, 1, "NEXT FIGURE");
+  wattroff(next_fig, COLOR_PAIR(1));
+  wrefresh(next_fig);
 }
 
-void print_pause(TGame *tetg, WINDOW *board) {
+// Отрисовка поля паузы
+void print_pause(WINDOW *board) {
   wbkgdset(board, COLOR_PAIR(1));
   mvwprintw(board, 13, 8, "PAUSE");
   wrefresh(board);
@@ -90,19 +100,23 @@ void print_pause(TGame *tetg, WINDOW *board) {
   nodelay(stdscr, TRUE);
 }
 
+// Отрисовка поля окончания игры
 void print_game_over(TGame *tetg, WINDOW *board) {
+  int score = tetg->hard_score;
+  if (tetg->hard_score < tetg->score) score = tetg->score;
   wbkgdset(board, COLOR_PAIR(1));
   mvwprintw(board, 13, 6, "GAME OVER!");
   mvwprintw(board, 14, 6, "SCORE: %d", tetg->score);
-  mvwprintw(board, 15, 4, "HARD SCORE: %d", tetg->hard_score);
+  mvwprintw(board, 15, 4, "HARD SCORE: %d", score);
   wrefresh(board);
   nodelay(stdscr, FALSE);
   getch();
   nodelay(stdscr, TRUE);
 }
 
+// Отрисовка поля начала игры
 void print_start(TGame *tetg, WINDOW *board) {
-    getch();
+  getch();
   print_tet(tetg, board);
   curs_set(0);
   wbkgdset(board, COLOR_PAIR(4));
@@ -124,13 +138,43 @@ void print_start(TGame *tetg, WINDOW *board) {
   nodelay(stdscr, TRUE);
 }
 
+// Отрисовка всех полей игры
 void print_front(TGame *tetg, Windows *win) {
-    if (tetg->status == START) print_start(tetg, win->board);
-    print_tet(tetg,  win->board);
-    print_rec(tetg,  win->record);
-    print_fig(tetg,  win->next_fig);
-    if (tetg->status == PAUSE) {
-        print_pause(tetg,  win->board);
-        tetg->status = PLAYING;
-    }
+  if (tetg->status == START) print_start(tetg, win->board);
+  print_tet(tetg, win->board);
+  print_rec(tetg, win->record);
+  print_fig(tetg, win->next_fig);
+  if (tetg->status == PAUSE) {
+    print_pause(win->board);
+    tetg->status = PLAYING;
+  }
+}
+
+// Инициализация библиотеки ncurses
+void init_ncurses() {
+  initscr();
+  start_color();
+  init_pair(1, COLOR_WHITE, COLOR_WHITE);
+  init_pair(2, COLOR_RED, COLOR_RED);
+  init_pair(3, COLOR_BLACK, COLOR_BLACK);
+  init_pair(4, COLOR_CYAN, COLOR_CYAN);
+
+  cbreak();
+  keypad(stdscr, TRUE);
+  timeout(0);
+  noecho();
+  nodelay(stdscr, TRUE);
+  scrollok(stdscr, TRUE);
+}
+
+// Создание окон игры
+Windows *init_win() {
+  Windows *win = (Windows *)malloc(sizeof(Windows));
+  if (win != NULL) {
+    win->board = newwin(26, 22, 5, 5);
+    win->next_fig = newwin(6, 14, 25, 30);
+    ;
+    win->record = newwin(12, 14, 11, 30);
+  }
+  return win;
 }
