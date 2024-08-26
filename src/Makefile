@@ -113,7 +113,7 @@ vg: clean tetris.a
 
 
 clean:
-	rm -rf $(TEST) *.o *.a *.gcno *.gcda *.gcov *.info report a.out *.dSYM obj s21_test
+	rm -rf $(TEST) *.o *.a *.gcno *.gcda *.gcov *.info report a.out *.dSYM obj s21_test build
 	@for ext in $(RM_EXTS); do \
 	find ./ -type f -name "*.$$ext" -exec rm {} \;; \
 	done
